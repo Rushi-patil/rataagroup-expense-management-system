@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../store/authSlice';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react'; // --- IMPORT ArrowLeft ---
 import NotificationModal from '../Notification/NotificationModal'; 
 import styles from './LoginPage.module.css';
 import rataaLogo from '../../assets/logo.png'; 
 
-const LoginPage = ({ onForgotPassword }) => {
+const LoginPage = ({ onForgotPassword, onNavigateHome }) => { // --- ACCEPT PROP ---
   const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +15,6 @@ const LoginPage = ({ onForgotPassword }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Notification State for Inactive Account
   const [notification, setNotification] = useState({ isOpen: false, message: '' });
 
   const handleLogin = async (e) => {
@@ -33,27 +32,19 @@ const LoginPage = ({ onForgotPassword }) => {
       const data = await response.json();
 
       if (response.ok) {
-        // --- LOGIN SUCCESS ---
-        // (API now returns 403 for inactive, so we assume active here)
         dispatch(loginSuccess({
             EmployeeID: data.EmployeeID,
             EmployeeName: data.EmployeeName,
             Email: data.Email,
             Role: data.Role,
         }));
-      
-      // --- 1. HANDLE INACTIVE ACCOUNT (403) ---
       } else if (response.status === 403) {
         setNotification({
             isOpen: true,
             message: "Your account is inactive. Please contact the admin team."
         });
-      
-      // --- 2. HANDLE INVALID CREDENTIALS (401) ---
       } else if (response.status === 401) {
         setError(data.detail || 'Invalid email or password');
-      
-      // --- 3. OTHER ERRORS ---
       } else {
         setError(data.detail || 'An error occurred. Please try again later.');
       }
@@ -67,6 +58,12 @@ const LoginPage = ({ onForgotPassword }) => {
 
   return (
     <div className={styles.container}>
+      
+      {/* --- BACK TO HOME BUTTON --- */}
+      <button className={styles.backButton} onClick={onNavigateHome}>
+        <ArrowLeft size={20} /> Back to Home
+      </button>
+
       <div className={styles.loginCard}>
         <div className={styles.logoContainer}>
           <img src={rataaLogo} alt="RATAA GROUP Logo" className={styles.logo} />
@@ -132,9 +129,17 @@ const LoginPage = ({ onForgotPassword }) => {
             Forgot password?
           </button>
         </form>
+
+        <div className={styles.footer}>
+          <p className={styles.footerText}>
+            Don't have an account?{' '}
+            <button type="button" className={styles.registerLink}>
+              Register!
+            </button>
+          </p>
+        </div>
       </div>
       
-      {/* Notification Modal for Inactive Account */}
       <NotificationModal 
         isOpen={notification.isOpen}
         message={notification.message}
