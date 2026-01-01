@@ -1,0 +1,171 @@
+/* Define Brand Colors based on RATAA logo */
+:root {
+  --rataa-gold: #99722b;
+  --rataa-green: #1c402e;
+  --input-bg: #f3f4f6; /* Light gray from reference image */
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  font-family: system-ui, -apple-system, sans-serif;
+  padding: 2rem;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.logoContainer {
+  margin-bottom: 2rem;
+}
+
+.logo {
+  /* Ensure wide logo fits well */
+  width: 220px; 
+  height: auto;
+  object-fit: contain;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--rataa-green); /* Using brand green for title */
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #9ca3af; /* Gray text */
+  margin-bottom: 2.5rem;
+  font-weight: 500;
+}
+
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* --- Custom Input Styling to match Reference --- */
+/* The container provides the gray background and rounded corners */
+.inputContainer {
+  background-color: var(--input-bg);
+  border-radius: 1rem;
+  padding: 0.75rem 1.25rem;
+  text-align: left;
+  transition: box-shadow 0.2s;
+}
+
+.inputContainer:focus-within {
+    box-shadow: 0 0 0 2px var(--rataa-gold);
+}
+
+.label {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280; /* Smaller gray label text */
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+/* The actual input is transparent so it sits inside the container */
+.input {
+  width: 100%;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: var(--rataa-green); /* Dark text for input value */
+  font-weight: 600;
+  padding: 0;
+  outline: none;
+}
+.input::placeholder {
+    color: #bdc1ca;
+    font-weight: 500;
+}
+
+/* Password specific styles */
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.eyeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.eyeIcon {
+    opacity: 0.7;
+}
+
+/* --- Buttons and Links --- */
+.loginButton {
+  width: 100%;
+  padding: 1rem;
+  /* Using RATAA gold instead of yellow */
+  background-color: var(--rataa-gold); 
+  color: white;
+  border: none;
+  border-radius: 2rem; /* fully rounded button */
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 0.5rem;
+}
+
+.loginButton:hover {
+  background-color: #866324; /* Slightly darker gold on hover */
+}
+
+.forgotPassword {
+  background: none;
+  border: none;
+  color: var(--rataa-gold); /* Brand gold for links */
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.footer {
+  margin-top: 3rem;
+}
+
+.footerText {
+  font-size: 0.95rem;
+  color: var(--rataa-green);
+  font-weight: 600;
+}
+
+.registerLink {
+  background: none;
+  border: none;
+  color: var(--rataa-gold);
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding-left: 0.25rem;
+}

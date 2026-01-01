@@ -1,0 +1,262 @@
+.header {
+  background: linear-gradient(135deg, #021a05 0%, #0d3512 100%);
+  color: white;
+  padding: 1rem 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid rgba(220, 177, 88, 0.1);
+  
+  /* --- NEW FIXED POSITIONING --- */
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* Ensure it stays above scrolling content */
+}
+
+/* Ensure the content inside stays centered */
+.headerContent {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --- Left Alignment (Logo) --- */
+.logoSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start; 
+}
+
+.logoImage {
+  height: 3rem; 
+  width: auto;    
+  object-fit: contain;
+  margin-bottom: 0.25rem; 
+  filter: brightness(1.1);
+}
+
+.subtitle {
+  font-size: 1.2rem; 
+  color: #e5e7eb; 
+  margin-top: 0.25rem; 
+  line-height: 1.2; 
+  font-weight: 400; 
+  letter-spacing: 0.02em;
+}
+
+/* --- Right Section Wrapper --- */
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 2rem; 
+}
+
+/* --- Stats Card --- */
+.statsCard {
+  text-align: right; 
+  display: flex;
+  flex-direction: column; 
+  justify-content: center;
+}
+
+.statsLabel {
+  font-size: 1.1rem; 
+  font-weight: 500; 
+  color: #d1d5db; 
+  margin-bottom: 0px; 
+  display: block; 
+}
+
+.statsValue {
+  font-family: 'Inter', sans-serif;
+  font-size: 2.75rem; 
+  font-weight: 700;
+  color: #dcb158; /* Gold color */
+  text-shadow: 0px 2px 4px rgba(0,0,0,0.3);
+  line-height: 1.1; 
+  letter-spacing: -0.02em;
+}
+
+/* Vertical separator line */
+.separator {
+  height: 3rem;
+  width: 1px;
+  background-color: rgba(255,255,255,0.15);
+}
+
+/* --- User Profile Button --- */
+.profileContainer {
+  position: relative; 
+}
+
+.profileButton {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3rem;
+  padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.avatarCircle {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dcb158;
+}
+
+.chevron {
+  color: #9ca3af;
+}
+
+.profileButton:hover, .profileButton.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* --- Dropdown Menu Styling --- */
+.dropdown {
+  position: absolute;
+  top: 130%; 
+  right: 0;
+  background-color: white;
+  color: #1f2937;
+  border-radius: 1.5rem; 
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  width: 280px;
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out;
+  border: 1px solid #f3f4f6;
+  padding: 0;
+  overflow: hidden;
+}
+
+.dropdownHeader {
+  padding: 2rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.largeAvatar {
+  width: 5rem;
+  height: 5rem;
+  background-color: #f3f4f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.profileName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.profileEmail {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0.25rem 0 0 0;
+}
+
+.divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  width: 85%;
+  margin: 0 auto;
+}
+
+.dropdownFooter {
+  padding: 1.5rem;
+}
+
+.logoutButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.logoutButton:hover {
+  background-color: #f9fafb;
+  border-color: #ef4444; 
+  color: #ef4444;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS FIX
+   ========================================= */
+@media (max-width: 768px) {
+  .headerContent {
+    flex-direction: column; 
+    align-items: flex-start;
+    padding: 0 1.5rem;
+    position: relative; /* REQUIRED: Sets the boundary for absolute positioning */
+  }
+  
+  /* 1. Force Profile to Top Right Corner */
+  .profileContainer {
+    position: absolute;
+    top: 0; 
+    right: 1.5rem; /* Aligns with the padding of the container */
+  }
+
+  /* 2. Adjust Logo area to ensure it doesn't overlap if text is long */
+  .logoSection {
+    margin-right: 4rem; 
+    margin-bottom: 1.5rem;
+  }
+  
+  /* 3. Adjust Stats to flow naturally below logo */
+  .rightSection {
+    width: 100%;
+    display: block; /* Remove flex here so stats can just sit normally */
+    margin-top: 0;
+  }
+
+  /* 4. Align Stats Left */
+  .statsCard {
+    text-align: left;
+    padding: 0;
+  }
+
+  .statsValue {
+    font-size: 2.25rem; 
+  }
+
+  /* Hide the separator line on mobile */
+  .separator { display: none; }
+  
+  .logoImage {
+    height: 2.25rem;
+  }
+}

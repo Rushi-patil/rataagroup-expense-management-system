@@ -1,0 +1,142 @@
+/* ... (Header and Button styles remain the same) ... */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0d3512; 
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.addButton {
+  background: linear-gradient(135deg, #dcb158 0%, #bf953f 100%);
+  color: #021a05;
+  padding: 0.75rem 1.75rem;
+  border-radius: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #c49a45;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(220, 177, 88, 0.3);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.addButton:hover {
+  background: linear-gradient(135deg, #e5c376 0%, #dcb158 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(220, 177, 88, 0.5);
+}
+
+.addButton:active {
+  transform: translateY(0);
+}
+
+/* --- UPDATED: Expense Container --- */
+.expenseContainer {
+  background-color: white;
+  border-radius: 1.5rem; 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 2rem; 
+  
+  /* --- KEY FIX: Use 'fit-content' or a small min-height --- */
+  min-height: fit-content; 
+  /* Alternatively, if fit-content isn't supported by older browsers you need, use: */
+  /* min-height: 200px; */
+  
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  
+  /* Ensure it expands if the list is long */
+  height: auto; 
+}
+
+/* --- Grid Layout --- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+/* --- Empty State --- */
+.emptyState {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  /* Give the empty state a specific height so it looks nice */
+  min-height: 250px; 
+  padding: 1rem 0;
+}
+
+.iconWrapper {
+  width: 5rem;
+  height: 5rem;
+  background-color: #fdf8e9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.emptyIcon {
+  color: #dcb158;
+  opacity: 0.9;
+}
+
+.emptyTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.emptyText {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+/* Spinner Animation */
+.spinner {
+  animation: spin 1s linear infinite;
+  color: #dcb158;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .addButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .expenseContainer {
+    padding: 1.5rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr; 
+  }
+}

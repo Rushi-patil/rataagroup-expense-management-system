@@ -1,0 +1,187 @@
+.card {
+  background-color: white;
+  border-radius: 1rem; /* Premium rounding */
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Softer shadow */
+  border: 1px solid rgba(0,0,0,0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+  border-color: rgba(220, 177, 88, 0.3); /* Subtle Gold border on hover */
+}
+
+/* --- Header Section --- */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.titleSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.categoryBadge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  background-color: #fdf8e9; /* Light Gold/Cream background */
+  color: #b45309; /* Dark Gold/Brown text */
+  border: 1px solid #fde68a;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.amount {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #dcb158; /* BRAND GOLD COLOR */
+  white-space: nowrap;
+  letter-spacing: -0.02em;
+}
+
+/* --- Content Rows --- */
+.dateRow, .attachmentRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.icon {
+  color: #9ca3af;
+}
+
+.description {
+  background-color: #f9fafb;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.5;
+  border: 1px solid #f3f4f6;
+}
+
+/* --- Footer --- */
+.cardFooter {
+  margin-top: auto; /* Pushes footer to bottom */
+  padding-top: 1rem;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.timestamps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.timeItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* --- Actions --- */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Edit Button - Dark Green (Brand) */
+.editButton {
+  background-color: #0d3512; 
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.editButton:hover {
+  background-color: #1a4a21; /* Slightly lighter green */
+}
+
+/* Delete Button - Red Outline (Subtle) */
+.deleteButton {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 0.5rem 0.75rem; /* Square-ish shape */
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.deleteButton:hover {
+  background-color: #dc2626;
+  color: white;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .cardHeader {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+  
+  .titleSection {
+    width: 100%;
+  }
+  
+  .amount {
+    font-size: 1.75rem;
+    align-self: flex-end; /* Align amount to right on mobile */
+  }
+
+  .cardFooter {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .actions {
+    width: 100%;
+  }
+
+  .editButton, .deleteButton {
+    flex: 1;
+    justify-content: center;
+  }
+}

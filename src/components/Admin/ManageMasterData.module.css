@@ -1,0 +1,351 @@
+.container {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  cursor: pointer;
+  color: #4b5563;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.backButton:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+.title {
+  font-size: 1.5rem;
+  color: #0d3512;
+  margin: 0;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab {
+  padding: 0.8rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #6b7280;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.activeTab {
+  color: #0d3512;
+  border-bottom-color: #dcb158; /* Gold */
+}
+
+/* Content Area */
+.content {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.listHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.addButton {
+  background: linear-gradient(135deg, #dcb158 0%, #bf953f 100%);
+  color: #021a05;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 1rem;
+  background-color: #f9fafb;
+  color: #4b5563;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #1f2937;
+}
+
+.nameCell {
+    display: flex;
+    flex-direction: column;
+}
+
+.subText {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.actionsCell {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.actionBtn {
+    background: #f3f4f6;
+    border: none;
+    padding: 0.4rem;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #4b5563;
+}
+
+.deleteBtn {
+    color: #dc2626;
+    background: #fef2f2;
+}
+
+/* Modal */
+.modalOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 400px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form input {
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+}
+
+.saveButton {
+    background: #0d3512;
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+/* Status Badge Styles */
+.statusBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.active {
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.inactive {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+/* Form Styles Tweaks */
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.inputGroup label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.inputGroup input, .inputGroup textarea {
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-family: inherit;
+}
+
+.hint {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.checkboxGroup input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #0d3512;
+}
+
+.checkboxGroup label {
+    cursor: pointer;
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.userDetailsBlock {
+    margin-top: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.detailRow {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+}
+
+.detailLabel {
+    color: #6b7280; /* Gray for labels */
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.detailValueId {
+    color: #0d3512; /* Brand Green for ID */
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    background-color: #f0fdf4;
+    padding: 0 4px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.detailValue {
+    color: #4b5563; /* Dark Gray for text */
+}
+
+/* --- Tweak Name Cell for alignment --- */
+.nameCell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding-bottom: 0.5rem; /* Spacing */
+}
+
+.mainText {
+    font-weight: 600;
+    color: #111827;
+    font-size: 1rem;
+}
+
+/* Specific Table Styles */
+.idBadge {
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    color: #0d3512;
+    background-color: #f0fdf4;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    border: 1px solid #dcfce7;
+}
+
+.nameText {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.emailText {
+    color: #4b5563;
+    font-size: 0.9rem;
+}
+
+/* Ensure table cells don't wrap awkwardly */
+.table th, .table td {
+    white-space: nowrap; 
+    /* You can remove nowrap if you want wrapping on mobile, 
+       but for data tables nowrap usually looks cleaner */
+}
+.spinner { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

@@ -1,0 +1,146 @@
+/* Global App Styling */
+.app {
+  min-height: 100vh;
+  background-color: #fafafa;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Flex Layout for Sticky Footer */
+  display: flex;
+  flex-direction: column;
+
+  /* HIDE SCROLLBAR */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* HIDE SCROLLBAR */
+.app, :global(body), :global(html) {
+  scrollbar-width: none; 
+  -ms-overflow-style: none;
+}
+
+.app::-webkit-scrollbar, 
+:global(body)::-webkit-scrollbar, 
+:global(html)::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- MAIN CONTENT --- */
+.main {
+  max-width: 1400px;
+  width: 100%; 
+  margin: 0 auto;
+  
+  flex: 1; 
+  
+  /* Desktop Padding (approx 128px top) */
+  padding: 8rem 2rem 2rem 2rem; 
+}
+
+/* --- Section Header --- */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0d3512; 
+  letter-spacing: -0.02em;
+}
+
+/* --- Premium Gold Button --- */
+.addButton {
+  background: linear-gradient(135deg, #dcb158 0%, #bf953f 100%);
+  color: #021a05;
+  padding: 0.75rem 1.75rem;
+  border-radius: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #c49a45;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(220, 177, 88, 0.3);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.addButton:hover {
+  background: linear-gradient(135deg, #e5c376 0%, #dcb158 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(220, 177, 88, 0.5);
+}
+
+.addButton:active {
+  transform: translateY(0);
+}
+
+/* --- Content Container --- */
+.expenseContainer {
+  background-color: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 3rem; 
+  min-height: 400px; 
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+/* --- Empty State --- */
+.emptyState {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem 0;
+}
+
+.iconWrapper {
+  width: 6rem;
+  height: 6rem;
+  background-color: #fdf8e9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.emptyIcon {
+  color: #dcb158;
+  opacity: 0.8;
+}
+
+.emptyTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+}
+
+.emptyText {
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+/* --- Grid Layout --- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+/* --- Mobile --- */
+@media (max-width: 768px) {
+  .main {
+    /* --- FIX: Increased padding to clear the taller Mobile Header --- */
+    /* Try 13rem or 14rem depending on exactly how tall your header wraps */
+    padding: 14rem 1.5rem 1.5rem 1.5rem;
+  }
+}
