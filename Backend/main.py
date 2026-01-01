@@ -5,7 +5,7 @@ from routes.expense_type import router as expense_type_router
 from routes.expense import router as expense
 from fastapi.middleware.cors import CORSMiddleware
 from routes.payment_mode import router as payment_mode_router
-
+from routes.user_groups import router as user_group_router
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -19,6 +19,7 @@ app.include_router(employee_router)
 app.include_router(expense_type_router)
 app.include_router(expense)
 app.include_router(payment_mode_router)
+app.include_router(user_group_router)
 
 @app.get("/")
 def root():

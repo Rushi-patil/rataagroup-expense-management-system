@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from bson import ObjectId
 from datetime import datetime
-from db import payment_mode_collection
+from db import payment_mode_collection, employee_collection
 from models import PaymentModeCreate, PaymentModeUpdate
 
 router = APIRouter(
@@ -124,3 +124,33 @@ def remove_payment_mode(payment_mode_id: str):
 
     return {"message": "Payment mode removed successfully"}
 
+# User based payment modes
+
+@router.get("/by-user/{employee_id}")
+def get_payment_modes_for_user(employee_id: str):
+
+    employee = employee_collection.find_one(
+        {"EmployeeID": employee_id}
+    )
+
+    if not employee:
+        raise HTTPException(
+            status_code=404,
+            detail="Employee not found"
+        )
+
+    assigned_ids = employee.get("AssignedPaymentModeIds", [])
+
+    payment_modes = list(
+        payment_mode_collection.find(
+            {
+                "_id": {"$in": [ObjectId(i) for i in assigned_ids]},
+                "isActive": True
+            }
+        )
+    )
+
+    for mode in payment_modes:
+        mode["_id"] = str(mode["_id"])
+
+    return payment_modes

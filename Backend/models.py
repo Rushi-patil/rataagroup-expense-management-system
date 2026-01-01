@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import List, Optional
+from typing import List, Literal, Optional
 from datetime import datetime
 
 # Employee creation
@@ -21,6 +21,14 @@ class EmployeeUpdate(BaseModel):
     MobileNo: Optional[str]
     isActive: Optional[bool]
 
+# Assignments:
+class RoleAssignmentRequest(BaseModel):
+    targetType: str  # "USER" or "GROUP"
+    targetId: str    # EmployeeID or groupId
+
+    role: Optional[str] = None
+    AssignedExpenseTypeIds: Optional[List[str]] = None
+    AssignedPaymentModeIds: Optional[List[str]] = None
 
 # Employee forgot password (simple version)
 class EmployeeForgotPassword(BaseModel):
@@ -84,4 +92,17 @@ class PaymentModeCreate(BaseModel):
 
 class PaymentModeUpdate(BaseModel):
     paymentModeName: Optional[str]
+    isActive: Optional[bool]
+
+#user groups
+class UserGroupCreate(BaseModel):
+    groupName: str
+    description: Optional[str] = ""
+    users: List[str] = []
+    isActive: Optional[bool] = True
+
+class UserGroupUpdate(BaseModel):
+    groupName: Optional[str]
+    description: Optional[str]
+    users: Optional[List[str]]
     isActive: Optional[bool]

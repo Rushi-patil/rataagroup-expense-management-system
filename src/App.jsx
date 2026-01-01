@@ -19,22 +19,27 @@ function App() {
   const [authView, setAuthView] = useState('login'); 
   const [totalExpenses, setTotalExpenses] = useState(0);
 
-  // --- MASTER DATA FETCHING LOGIC ---
+  // --- MASTER DATA FETCHING LOGIC (Updated for User-Specific Data) ---
   useEffect(() => {
     const fetchMasterData = async () => {
       const TWO_HOURS = 2 * 60 * 60 * 1000;
       const now = Date.now();
       const isStale = !lastFetched || (now - lastFetched > TWO_HOURS);
 
-      if (isAuthenticated && isStale) {
+      // Only fetch if authenticated and user object exists (need EmployeeID)
+      if (isAuthenticated && user?.EmployeeID && isStale) {
         try {
-          const typesRes = await fetch('http://127.0.0.1:8000/expense-type/active');
+          // 1. Fetch User-Specific Expense Types
+          // Old: /expense-type/active
+          const typesRes = await fetch(`http://127.0.0.1:8000/expense-type/by-user/${user.EmployeeID}`);
           if (typesRes.ok) {
             const typesData = await typesRes.json();
             dispatch(setExpenseTypes(typesData));
           }
 
-          const modesRes = await fetch('http://127.0.0.1:8000/payment-mode/active');
+          // 2. Fetch User-Specific Payment Modes
+          // Old: /payment-mode/active
+          const modesRes = await fetch(`http://127.0.0.1:8000/payment-mode/by-user/${user.EmployeeID}`);
           if (modesRes.ok) {
              const modesData = await modesRes.json();
              dispatch(setPaymentModes(modesData));
@@ -45,7 +50,7 @@ function App() {
       }
     };
     fetchMasterData();
-  }, [isAuthenticated, lastFetched, dispatch]);
+  }, [isAuthenticated, lastFetched, dispatch, user]); // Added user dependency
 
   const handleLogout = () => {
     dispatch(logout());
@@ -81,7 +86,6 @@ function App() {
       
       <main className={styles.main}>
         {isAdmin ? (
-            /* --- PASS onTotalChange TO ADMIN DASHBOARD --- */
             <AdminDashboard onTotalChange={setTotalExpenses} />
         ) : (
             <ExpenseList 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from models import ExpenseTypeCreate, ExpenseTypeUpdate
-from db import expense_type_collection
+from db import expense_type_collection, employee_collection
 from datetime import datetime
 from bson import ObjectId
 
@@ -143,3 +143,33 @@ def get_expense_type_by_id(expense_type_id: str):
 
     return expense_type
 
+#user based expense types 
+
+@router.get("/by-user/{employee_id}")
+def get_expense_types_for_user(employee_id: str):
+
+    employee = employee_collection.find_one(
+        {"EmployeeID": employee_id}
+    )
+
+    if not employee:
+        raise HTTPException(
+            status_code=404,
+            detail="Employee not found"
+        )
+
+    assigned_ids = employee.get("AssignedExpenseTypeIds", [])
+
+    expense_types = list(
+        expense_type_collection.find(
+            {
+                "_id": {"$in": [ObjectId(i) for i in assigned_ids]},
+                "IsActive": True
+            }
+        )
+    )
+
+    for exp in expense_types:
+        exp["_id"] = str(exp["_id"])
+
+    return expense_types

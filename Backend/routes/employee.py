@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from models import EmployeeCreate, EmployeeLogin, ForgotPasswordRequest, ForgotPasswordVerify, EmployeeUpdate
-from db import employee_collection
+from models import EmployeeCreate, EmployeeLogin, ForgotPasswordRequest, ForgotPasswordVerify, EmployeeUpdate, RoleAssignmentRequest
+from db import employee_collection, user_groups_collection
 from passlib.context import CryptContext
 import smtplib
 from email.message import EmailMessage
@@ -154,14 +154,12 @@ def login_employee(login_data: EmployeeLogin):
             detail="Invalid email or password"
         )
 
-    # Block inactive users
     if employee.get("isActive") is False:
         raise HTTPException(
             status_code=403,
-            detail="Employee account is inactive. Please contact admin."
+            detail="Employee account is inactive"
         )
 
-    # Role determination
     role = "Admin" if login_data.Email.lower() == "admin@rataagroup.com" else "Employee"
 
     return {
@@ -170,7 +168,11 @@ def login_employee(login_data: EmployeeLogin):
         "EmployeeName": employee["EmployeeName"],
         "Email": employee["Email"],
         "Role": role,
-        "isActive": employee.get("isActive", True)
+        "isActive": employee.get("isActive", True),
+
+        # ✅ IDs only
+        "AssignedExpenseTypeIds": employee.get("AssignedExpenseTypeIds", []),
+        "AssignedPaymentModeIds": employee.get("AssignedPaymentModeIds", [])
     }
 
 
@@ -281,4 +283,89 @@ def get_all_employees():
     return {
         "count": len(employees),
         "employees": employees
+    }
+
+#Assignment API
+@router.put("/apply")
+def apply_assignments(payload: RoleAssignmentRequest):
+
+    employee_ids = []
+
+    # 🔹 Resolve target
+    if payload.targetType == "USER":
+        employee = employee_collection.find_one(
+            {"EmployeeID": payload.targetId}
+        )
+        if not employee:
+            raise HTTPException(
+                status_code=404,
+                detail="Employee not found"
+            )
+        employee_ids = [payload.targetId]
+
+    elif payload.targetType == "GROUP":
+        group = user_groups_collection.find_one(
+            {"groupId": payload.targetId}
+        )
+        if not group:
+            raise HTTPException(
+                status_code=404,
+                detail="Group not found"
+            )
+
+        employee_ids = group.get("users", [])
+
+        if not employee_ids:
+            raise HTTPException(
+                status_code=400,
+                detail="Group has no users"
+            )
+
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid targetType. Use USER or GROUP"
+        )
+
+    # 🔹 Validate ObjectIds
+    for field in ["AssignedExpenseTypeIds", "AssignedPaymentModeIds"]:
+        ids = getattr(payload, field)
+        if ids:
+            for _id in ids:
+                if not ObjectId.is_valid(_id):
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Invalid ID in {field}"
+                    )
+
+    # 🔹 Prepare update data
+    update_data = {}
+
+    if payload.role is not None:
+        update_data["Role"] = payload.role
+
+    if payload.AssignedExpenseTypeIds is not None:
+        update_data["AssignedExpenseTypeIds"] = payload.AssignedExpenseTypeIds
+
+    if payload.AssignedPaymentModeIds is not None:
+        update_data["AssignedPaymentModeIds"] = payload.AssignedPaymentModeIds
+
+    if not update_data:
+        raise HTTPException(
+            status_code=400,
+            detail="Nothing to assign"
+        )
+
+    # 🔹 Apply assignments
+    result = employee_collection.update_many(
+        {"EmployeeID": {"$in": employee_ids}},
+        {"$set": update_data}
+    )
+
+    return {
+        "message": "Assignments applied successfully",
+        "targetType": payload.targetType,
+        "targetId": payload.targetId,
+        "affectedEmployees": result.modified_count,
+        "assignments": update_data
     }

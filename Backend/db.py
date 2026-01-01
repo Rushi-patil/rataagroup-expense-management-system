@@ -13,4 +13,5 @@ employee_collection = db["Employees"]
 expense_type_collection = db["ExpenseTypes"]
 expenses_collection = db["ExpensesCollection"]
 payment_mode_collection = db["PaymentModeCollection"]
+user_groups_collection = db["UserGroupsCollection"]
 fs = gridfs.GridFS(db)
