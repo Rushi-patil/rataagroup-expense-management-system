@@ -7,6 +7,7 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import LoginPage from './components/Login/LoginPage';
 import ForgotPasswordPage from './components/Login/ForgotPasswordPage';
+import HomePage from './components/Home/HomePage'; // --- IMPORT HOME PAGE ---
 import ExpenseList from './components/ExpenseList/ExpenseList'; 
 import AdminDashboard from './components/Admin/AdminDashboard'; 
 import styles from './App.module.css';
@@ -16,10 +17,11 @@ function App() {
   const { lastFetched } = useSelector((state) => state.masterData);
   const dispatch = useDispatch();
 
-  const [authView, setAuthView] = useState('login'); 
+  // --- STATE CHANGE: Default view is now 'home' ---
+  const [authView, setAuthView] = useState('home'); 
   const [totalExpenses, setTotalExpenses] = useState(0);
 
-  // --- MASTER DATA FETCHING LOGIC (Updated for User-Specific Data) ---
+  // --- MASTER DATA FETCHING LOGIC (User-Specific) ---
   useEffect(() => {
     const fetchMasterData = async () => {
       const TWO_HOURS = 2 * 60 * 60 * 1000;
@@ -30,7 +32,6 @@ function App() {
       if (isAuthenticated && user?.EmployeeID && isStale) {
         try {
           // 1. Fetch User-Specific Expense Types
-          // Old: /expense-type/active
           const typesRes = await fetch(`http://127.0.0.1:8000/expense-type/by-user/${user.EmployeeID}`);
           if (typesRes.ok) {
             const typesData = await typesRes.json();
@@ -38,7 +39,6 @@ function App() {
           }
 
           // 2. Fetch User-Specific Payment Modes
-          // Old: /payment-mode/active
           const modesRes = await fetch(`http://127.0.0.1:8000/payment-mode/by-user/${user.EmployeeID}`);
           if (modesRes.ok) {
              const modesData = await modesRes.json();
@@ -50,53 +50,63 @@ function App() {
       }
     };
     fetchMasterData();
-  }, [isAuthenticated, lastFetched, dispatch, user]); // Added user dependency
+  }, [isAuthenticated, lastFetched, dispatch, user]);
 
   const handleLogout = () => {
     dispatch(logout());
     dispatch(clearMasterData());
-    setAuthView('login');
+    setAuthView('home'); // Redirect to Home on logout
     setTotalExpenses(0);
   };
 
+  // Navigation Handlers
   const navigateToLogin = () => setAuthView('login');
   const navigateToForgot = () => setAuthView('forgot');
 
-  if (!isAuthenticated) {
+  // --- RENDER LOGIC ---
+
+  // 1. If Authenticated, Show Main App (Admin or User)
+  if (isAuthenticated) {
+    const isAdmin = user?.Role === 'Admin' || user?.role === 'admin' || user?.isAdmin === true;
     return (
-      <>
-        {authView === 'login' ? (
-          <LoginPage onForgotPassword={navigateToForgot} />
-        ) : (
-          <ForgotPasswordPage onNavigateLogin={navigateToLogin} />
-        )}
-      </>
+      <div className={styles.app}>
+        <Header 
+          totalExpenses={totalExpenses} 
+          user={user} 
+          onLogout={handleLogout} 
+        />
+        
+        <main className={styles.main}>
+          {isAdmin ? (
+              <AdminDashboard onTotalChange={setTotalExpenses} />
+          ) : (
+              <ExpenseList 
+                  user={user} 
+                  onTotalChange={setTotalExpenses} 
+              />
+          )}
+        </main>
+
+        <Footer />
+      </div>
     );
   }
 
-  const isAdmin = user?.Role === 'Admin' || user?.role === 'admin' || user?.isAdmin === true;
-
+  // 2. If Not Authenticated, Switch Views (Home -> Login -> Forgot)
   return (
-    <div className={styles.app}>
-      <Header 
-        totalExpenses={totalExpenses} 
-        user={user} 
-        onLogout={handleLogout} 
-      />
+    <>
+      {authView === 'home' && (
+        <HomePage onNavigateLogin={navigateToLogin} />
+      )}
       
-      <main className={styles.main}>
-        {isAdmin ? (
-            <AdminDashboard onTotalChange={setTotalExpenses} />
-        ) : (
-            <ExpenseList 
-                user={user} 
-                onTotalChange={setTotalExpenses} 
-            />
-        )}
-      </main>
-
-      <Footer />
-    </div>
+      {authView === 'login' && (
+        <LoginPage onForgotPassword={navigateToForgot} />
+      )}
+      
+      {authView === 'forgot' && (
+        <ForgotPasswordPage onNavigateLogin={navigateToLogin} />
+      )}
+    </>
   );
 }
 
