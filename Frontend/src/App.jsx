@@ -20,6 +20,9 @@ function App() {
   const [authView, setAuthView] = useState('home'); 
   const [totalExpenses, setTotalExpenses] = useState(0);
 
+  // --- DETERMINE ROLE EARLY ---
+  const isAdmin = user?.Role === 'Admin' || user?.role === 'admin' || user?.isAdmin === true;
+
   // --- MASTER DATA FETCHING LOGIC ---
   useEffect(() => {
     const fetchMasterData = async () => {
@@ -29,13 +32,26 @@ function App() {
 
       if (isAuthenticated && user?.EmployeeID && isStale) {
         try {
-          const typesRes = await fetch(`http://127.0.0.1:8000/expense-type/by-user/${user.EmployeeID}`);
+          // --- CONDITIONAL URLS BASED ON ROLE ---
+          // Admin gets ALL data (for dashboard filters/lookups)
+          // Employees get only ASSIGNED data (for dropdowns in add form)
+          const expenseUrl = isAdmin 
+            ? 'http://127.0.0.1:8000/expense-type/all' 
+            : `http://127.0.0.1:8000/expense-type/by-user/${user.EmployeeID}`;
+
+          const paymentUrl = isAdmin
+            ? 'http://127.0.0.1:8000/payment-mode/all'
+            : `http://127.0.0.1:8000/payment-mode/by-user/${user.EmployeeID}`;
+
+          // 1. Fetch Expense Types
+          const typesRes = await fetch(expenseUrl);
           if (typesRes.ok) {
             const typesData = await typesRes.json();
             dispatch(setExpenseTypes(typesData));
           }
 
-          const modesRes = await fetch(`http://127.0.0.1:8000/payment-mode/by-user/${user.EmployeeID}`);
+          // 2. Fetch Payment Modes
+          const modesRes = await fetch(paymentUrl);
           if (modesRes.ok) {
              const modesData = await modesRes.json();
              dispatch(setPaymentModes(modesData));
@@ -46,7 +62,7 @@ function App() {
       }
     };
     fetchMasterData();
-  }, [isAuthenticated, lastFetched, dispatch, user]);
+  }, [isAuthenticated, lastFetched, dispatch, user, isAdmin]); 
 
   const handleLogout = () => {
     dispatch(logout());
@@ -57,16 +73,29 @@ function App() {
 
   const navigateToLogin = () => setAuthView('login');
   const navigateToForgot = () => setAuthView('forgot');
-  const navigateToHome = () => setAuthView('home');
+
+  // --- RENDER LOGIC ---
 
   if (isAuthenticated) {
-    const isAdmin = user?.Role === 'Admin' || user?.role === 'admin' || user?.isAdmin === true;
     return (
       <div className={styles.app}>
-        <Header totalExpenses={totalExpenses} user={user} onLogout={handleLogout} />
+        <Header 
+          totalExpenses={totalExpenses} 
+          user={user} 
+          onLogout={handleLogout} 
+        />
+        
         <main className={styles.main}>
-          {isAdmin ? <AdminDashboard onTotalChange={setTotalExpenses} /> : <ExpenseList user={user} onTotalChange={setTotalExpenses} />}
+          {isAdmin ? (
+              <AdminDashboard onTotalChange={setTotalExpenses} />
+          ) : (
+              <ExpenseList 
+                  user={user} 
+                  onTotalChange={setTotalExpenses} 
+              />
+          )}
         </main>
+
         <Footer />
       </div>
     );
@@ -79,10 +108,7 @@ function App() {
       )}
       
       {authView === 'login' && (
-        <LoginPage 
-            onForgotPassword={navigateToForgot} 
-            onNavigateHome={navigateToHome} // --- ADDED PROP HERE ---
-        />
+        <LoginPage onForgotPassword={navigateToForgot} />
       )}
       
       {authView === 'forgot' && (
