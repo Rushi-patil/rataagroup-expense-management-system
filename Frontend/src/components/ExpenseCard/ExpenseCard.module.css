@@ -1,187 +1,145 @@
 .card {
   background-color: white;
-  border-radius: 1rem; /* Premium rounding */
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Softer shadow */
-  border: 1px solid rgba(0,0,0,0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 270px; /* REDUCED HEIGHT */
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  position: relative;
+  width: 100%;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
-  border-color: rgba(220, 177, 88, 0.3); /* Subtle Gold border on hover */
-}
-
-/* --- Header Section --- */
+/* Header */
 .cardHeader {
+  padding: 1rem 1rem 0.4rem 1rem;
+  flex-shrink: 0;
+  border-bottom: 1px solid transparent;
+}
+
+.topRow {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
-}
-
-.titleSection {
-  display: flex;
-  flex-direction: column;
   gap: 0.5rem;
-  flex: 1;
+  margin-bottom: 0.25rem;
 }
 
 .title {
-  font-size: 1.1rem;
+  font-size: 1rem; /* Smaller Title */
   font-weight: 700;
   color: #1f2937;
-  line-height: 1.4;
+  margin: 0;
+  line-height: 1.2;
   word-break: break-word;
-}
-
-.categoryBadge {
-  display: inline-block;
-  align-self: flex-start;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.25rem 0.75rem;
-  border-radius: 2rem;
-  background-color: #fdf8e9; /* Light Gold/Cream background */
-  color: #b45309; /* Dark Gold/Brown text */
-  border: 1px solid #fde68a;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .amount {
-  font-family: 'Inter', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #dcb158; /* BRAND GOLD COLOR */
+  font-size: 1.1rem; /* Smaller Amount */
+  font-weight: 800;
+  color: #dcb158;
   white-space: nowrap;
-  letter-spacing: -0.02em;
 }
 
-/* --- Content Rows --- */
-.dateRow, .attachmentRow {
+.badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #b45309;
+  background-color: #fffbeb;
+  border: 1px solid #fcd34d;
+  padding: 0.15rem 0.5rem;
+  border-radius: 1rem;
+}
+
+/* Body */
+.cardBody {
+  flex: 1;
+  padding: 0.25rem 1rem;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.cardBody::-webkit-scrollbar { display: none; }
+
+.dateRow {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.icon {
-  color: #9ca3af;
-}
-
-.description {
-  background-color: #f9fafb;
-  padding: 0.75rem;
-  border-radius: 0.75rem;
-  font-size: 0.9rem;
-  color: #4b5563;
-  line-height: 1.5;
-  border: 1px solid #f3f4f6;
-}
-
-/* --- Footer --- */
-.cardFooter {
-  margin-top: auto; /* Pushes footer to bottom */
-  padding-top: 1rem;
-  border-top: 1px solid #f3f4f6;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.timestamps {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.timeItem {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  gap: 0.3rem;
   font-size: 0.75rem;
   color: #9ca3af;
+  margin-bottom: 0.5rem;
 }
 
-/* --- Actions --- */
-.actions {
-  display: flex;
-  gap: 0.5rem;
+.infoRow {
+  font-size: 0.8rem;
+  color: #4b5563;
+  margin-bottom: 0.4rem;
 }
 
-/* Edit Button - Dark Green (Brand) */
-.editButton {
-  background-color: #0d3512; 
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  border: none;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
+.label { color: #6b7280; margin-right: 0.2rem; }
+.valueHighlight { font-weight: 700; color: #111827; }
+
+.description {
+  font-size: 0.8rem;
+  color: #374151;
+  line-height: 1.4;
+  background-color: #f9fafb;
+  padding: 0.4rem;
+  border-radius: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.descLabel { font-weight: 700; color: #1f2937; margin-right: 0.2rem; }
+
+/* Extra Details */
+.extraDetails { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.4rem; }
+.detailItem {
+    font-size: 0.7rem;
+    background: #f0fdf4;
+    color: #166534;
+    padding: 2px 5px;
+    border-radius: 4px;
+    display: flex; align-items: center; gap: 3px;
+}
+
+/* Attachments */
+.attachments { margin-top: 0.4rem; border-top: 1px solid #f3f4f6; padding-top: 0.4rem; }
+.attachLabel { font-size: 0.7rem; color: #9ca3af; display: flex; align-items: center; gap: 0.3rem; margin-bottom: 0.2rem; }
+.fileList { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.fileLink { font-size: 0.7rem; color: #2563eb; text-decoration: underline; word-break: break-all; }
+
+/* Footer */
+.cardFooter {
+  padding: 0.6rem 1rem 0.8rem 1rem;
+  flex-shrink: 0;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  transition: background-color 0.2s;
+  border-top: 1px solid #f3f4f6;
+  margin-top: auto;
+  background: white;
 }
 
-.editButton:hover {
-  background-color: #1a4a21; /* Slightly lighter green */
+.createdDate { font-size: 0.65rem; color: #9ca3af; }
+
+.actions { display: flex; gap: 0.4rem; }
+
+.editBtn {
+  background-color: #022c22; color: white; border: none;
+  padding: 0.3rem 0.6rem; border-radius: 0.3rem;
+  font-size: 0.75rem; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 0.2rem;
 }
+.editBtn:hover { background-color: #064e3b; }
 
-/* Delete Button - Red Outline (Subtle) */
-.deleteButton {
-  background-color: #fee2e2;
-  color: #dc2626;
-  padding: 0.5rem 0.75rem; /* Square-ish shape */
-  border-radius: 0.5rem;
-  border: 1px solid transparent;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
+.deleteBtn {
+  background-color: #fee2e2; color: #dc2626; border: none;
+  padding: 0.3rem 0.5rem; border-radius: 0.3rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
 }
-
-.deleteButton:hover {
-  background-color: #dc2626;
-  color: white;
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 480px) {
-  .cardHeader {
-    flex-direction: column-reverse;
-    gap: 0.5rem;
-  }
-  
-  .titleSection {
-    width: 100%;
-  }
-  
-  .amount {
-    font-size: 1.75rem;
-    align-self: flex-end; /* Align amount to right on mobile */
-  }
-
-  .cardFooter {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .actions {
-    width: 100%;
-  }
-
-  .editButton, .deleteButton {
-    flex: 1;
-    justify-content: center;
-  }
-}
+.deleteBtn:hover { background-color: #fecaca; }

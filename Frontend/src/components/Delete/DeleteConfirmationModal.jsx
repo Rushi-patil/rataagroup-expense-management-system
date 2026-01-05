@@ -1,15 +1,15 @@
 import React from 'react';
-import { Trash2, AlertTriangle } from 'lucide-react';
+import { Trash2, Loader2 } from 'lucide-react'; // Import Loader2
 import styles from './DeleteConfirmationModal.module.css';
 
-const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
+const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, isLoading }) => {
   if (!isOpen) return null;
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    // Prevent closing via overlay click if loading
+    <div className={styles.overlay} onClick={!isLoading ? onClose : undefined}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         
-        {/* Icon Circle (Gold on Dark Green) */}
         <div className={styles.iconContainer}>
           <Trash2 className={styles.icon} size={32} />
         </div>
@@ -23,11 +23,27 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
         </p>
 
         <div className={styles.actions}>
-          <button className={styles.cancelButton} onClick={onClose}>
+          <button 
+            className={styles.cancelButton} 
+            onClick={onClose}
+            disabled={isLoading} // Disable Cancel
+          >
             Cancel
           </button>
-          <button className={styles.deleteButton} onClick={onConfirm}>
-            Yes, Delete
+          
+          <button 
+            className={styles.deleteButton} 
+            onClick={onConfirm}
+            disabled={isLoading} // Disable Delete
+          >
+            {isLoading ? (
+                <>
+                    <Loader2 className={styles.spinner} size={18} />
+                    <span>Deleting...</span>
+                </>
+            ) : (
+                "Yes, Delete"
+            )}
           </button>
         </div>
 

@@ -4,8 +4,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6); /* Slightly darker for focus */
-  backdrop-filter: blur(4px); /* Modern blur effect */
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,7 +15,7 @@
 
 .modal {
   background-color: white;
-  border-radius: 1.5rem; /* Matches App/Modal rounding */
+  border-radius: 1.5rem;
   padding: 2.5rem 2rem;
   max-width: 400px;
   width: 90%;
@@ -24,26 +24,22 @@
   animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* --- Brand Themed Icon --- */
 .iconContainer {
   margin-bottom: 1.5rem;
   display: inline-flex;
   padding: 1.25rem;
-  /* Dark Green Background (Matches Header) */
   background: linear-gradient(135deg, #021a05 0%, #0d3512 100%);
   border-radius: 50%;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #dcb158; /* Gold Border Ring */
+  border: 1px solid #dcb158;
 }
 
-.icon {
-  color: #dcb158; /* Brand Gold Icon */
-}
+.icon { color: #dcb158; }
 
 .title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #0d3512; /* Dark Green Text */
+  color: #0d3512;
   margin-bottom: 0.75rem;
   letter-spacing: -0.01em;
 }
@@ -55,18 +51,17 @@
   line-height: 1.6;
 }
 
-/* --- Actions --- */
+/* Actions */
 .actions {
   display: flex;
   gap: 1rem;
   justify-content: center;
 }
 
-/* Base Button Style */
 .cancelButton, .deleteButton {
   flex: 1;
   padding: 0.75rem 1.5rem;
-  border-radius: 2rem; /* Pill shape */
+  border-radius: 2rem;
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
@@ -74,20 +69,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem; /* Space between icon and text */
 }
 
-/* Cancel: Dark Green Outline (Brand) */
+/* --- DISABLED STATE --- */
+.cancelButton:disabled, .deleteButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Cancel Button */
 .cancelButton {
   background-color: white;
   border: 1px solid #0d3512;
   color: #0d3512;
 }
 
-.cancelButton:hover {
-  background-color: #f0fdf4; /* Light Green Tint */
+.cancelButton:not(:disabled):hover {
+  background-color: #f0fdf4;
 }
 
-/* Delete: Red (Safety First - Standard Pattern) */
+/* Delete Button */
 .deleteButton {
   background-color: #dc2626;
   border: 1px solid #dc2626;
@@ -95,7 +99,7 @@
   box-shadow: 0 4px 6px rgba(220, 38, 38, 0.25);
 }
 
-.deleteButton:hover {
+.deleteButton:not(:disabled):hover {
   background-color: #b91c1c;
   transform: translateY(-1px);
   box-shadow: 0 6px 10px rgba(220, 38, 38, 0.3);
@@ -105,7 +109,16 @@
   transform: translateY(0);
 }
 
-/* Animations */
+/* Spinner Animation */
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

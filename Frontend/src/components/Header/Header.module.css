@@ -1,19 +1,18 @@
 .header {
   background: linear-gradient(135deg, #021a05 0%, #0d3512 100%);
   color: white;
-  padding: 1rem 0;
+  /* REDUCED PADDING: Was 1rem, now 0.6rem */
+  padding: 0.6rem 0; 
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   border-bottom: 1px solid rgba(220, 177, 88, 0.1);
   
-  /* --- NEW FIXED POSITIONING --- */
   position: fixed; 
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1000; /* Ensure it stays above scrolling content */
+  z-index: 1000;
 }
 
-/* Ensure the content inside stays centered */
 .headerContent {
   max-width: 1400px;
   margin: 0 auto;
@@ -32,27 +31,27 @@
 }
 
 .logoImage {
-  height: 3rem; 
+  /* REDUCED HEIGHT: Was 3rem, now 2.4rem */
+  height: 2.4rem; 
   width: auto;    
   object-fit: contain;
-  margin-bottom: 0.25rem; 
+  margin-bottom: 0.1rem; 
   filter: brightness(1.1);
 }
 
 .subtitle {
-  font-size: 1.2rem; 
+  /* REDUCED FONT: Was 1.2rem, now 1rem */
+  font-size: 1rem; 
   color: #e5e7eb; 
-  margin-top: 0.25rem; 
+  margin-top: 0; 
   line-height: 1.2; 
-  font-weight: 400; 
-  letter-spacing: 0.02em;
 }
 
-/* --- Right Section Wrapper --- */
+/* --- Right Section --- */
 .rightSection {
   display: flex;
   align-items: center;
-  gap: 2rem; 
+  gap: 1.5rem; /* Slightly reduced gap */
 }
 
 /* --- Stats Card --- */
@@ -64,21 +63,19 @@
 }
 
 .statsLabel {
-  font-size: 1.1rem; 
+  font-size: 0.9rem; /* Smaller label */
   font-weight: 500; 
   color: #d1d5db; 
-  margin-bottom: 0px; 
-  display: block; 
 }
 
 .statsValue {
   font-family: 'Inter', sans-serif;
-  font-size: 2.75rem; 
+  /* REDUCED SIZE: Was 2.75rem, now 2rem */
+  font-size: 2rem; 
   font-weight: 700;
-  color: #dcb158; /* Gold color */
+  color: #dcb158; 
   text-shadow: 0px 2px 4px rgba(0,0,0,0.3);
-  line-height: 1.1; 
-  letter-spacing: -0.02em;
+  line-height: 1; 
 }
 
 /* Vertical separator line */
@@ -220,43 +217,29 @@
     flex-direction: column; 
     align-items: flex-start;
     padding: 0 1.5rem;
-    position: relative; /* REQUIRED: Sets the boundary for absolute positioning */
+    position: relative;
   }
-  
-  /* 1. Force Profile to Top Right Corner */
   .profileContainer {
     position: absolute;
     top: 0; 
-    right: 1.5rem; /* Aligns with the padding of the container */
+    right: 1.5rem; 
   }
-
-  /* 2. Adjust Logo area to ensure it doesn't overlap if text is long */
   .logoSection {
     margin-right: 4rem; 
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem; /* Reduced margin */
   }
-  
-  /* 3. Adjust Stats to flow naturally below logo */
   .rightSection {
     width: 100%;
-    display: block; /* Remove flex here so stats can just sit normally */
+    display: block; 
     margin-top: 0;
   }
-
-  /* 4. Align Stats Left */
   .statsCard {
     text-align: left;
     padding: 0;
   }
-
   .statsValue {
-    font-size: 2.25rem; 
+    font-size: 1.8rem; 
   }
-
-  /* Hide the separator line on mobile */
   .separator { display: none; }
-  
-  .logoImage {
-    height: 2.25rem;
-  }
+  .logoImage { height: 2rem; }
 }

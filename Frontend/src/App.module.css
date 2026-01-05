@@ -1,15 +1,12 @@
 /* Global App Styling */
 .app {
-  min-height: 100vh;
+  height: 100vh; 
+  width: 100vw;
   background-color: #fafafa;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  
-  /* Flex Layout for Sticky Footer */
   display: flex;
   flex-direction: column;
-
-  /* HIDE SCROLLBAR */
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden; /* CRITICAL: Prevents body scroll */
 }
 
 /* HIDE SCROLLBAR */
@@ -29,11 +26,18 @@
   max-width: 1400px;
   width: 100%; 
   margin: 0 auto;
-  
+
+  /* This fills the screen height */
   flex: 1; 
-  
-  /* Desktop Padding (approx 128px top) */
-  padding: 8rem 2rem 2rem 2rem; 
+  display: flex; 
+  flex-direction: column;
+  overflow: hidden; 
+
+  /* --- CRITICAL ADJUSTMENT --- */
+  /* Reduced from 10rem to ~7.5rem (approx 120px).
+     This pulls the "Expense Records" title UP towards the header.
+     If it's still too far, try 7rem. If it overlaps, try 8rem. */
+  padding: 7.5rem 2rem 1rem 2rem; 
 }
 
 /* --- Section Header --- */
@@ -139,8 +143,27 @@
 /* --- Mobile --- */
 @media (max-width: 768px) {
   .main {
-    /* --- FIX: Increased padding to clear the taller Mobile Header --- */
-    /* Try 13rem or 14rem depending on exactly how tall your header wraps */
-    padding: 14rem 1.5rem 1.5rem 1.5rem;
+    /* FIX: Increased from 6.5rem to 12rem. 
+       This pushes "Expense Records" down so it clears the taller mobile header. */
+    padding: 9rem 0.5rem 0.5rem 0.5rem; 
+    
+    width: 100%;
+    max-width: 100%;
+    
+    /* Ensure flex is still active */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
+
+  .expenseContainer {
+    padding: 1rem; 
+    border-radius: 1rem;
+    /* Optional: Ensure it takes available height */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ... rest of mobile styles ... */
 }

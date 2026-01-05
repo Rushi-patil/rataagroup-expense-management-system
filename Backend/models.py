@@ -84,7 +84,9 @@ class ExpenseUpdate(BaseModel):
     equipmentName: Optional[str]
     equipmentType: Optional[str]
 
-
+class ExpenseDeleteRequest(BaseModel):
+    expenseIds: List[str]
+    
 class PaymentModeCreate(BaseModel):
     paymentModeName: str
     isActive: Optional[bool] = True

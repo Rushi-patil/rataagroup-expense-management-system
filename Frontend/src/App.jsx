@@ -4,7 +4,7 @@ import { setExpenseTypes, setPaymentModes, clearMasterData } from './store/maste
 import { logout } from './store/authSlice';
 
 import Header from './components/Header/Header';
-import Footer from './components/Footer/Footer';
+// Remove global Footer import
 import LoginPage from './components/Login/LoginPage';
 import ForgotPasswordPage from './components/Login/ForgotPasswordPage';
 import HomePage from './components/Home/HomePage'; 
@@ -20,10 +20,8 @@ function App() {
   const [authView, setAuthView] = useState('home'); 
   const [totalExpenses, setTotalExpenses] = useState(0);
 
-  // --- DETERMINE ROLE EARLY ---
   const isAdmin = user?.Role === 'Admin' || user?.role === 'admin' || user?.isAdmin === true;
 
-  // --- MASTER DATA FETCHING LOGIC ---
   useEffect(() => {
     const fetchMasterData = async () => {
       const TWO_HOURS = 2 * 60 * 60 * 1000;
@@ -32,9 +30,6 @@ function App() {
 
       if (isAuthenticated && user?.EmployeeID && isStale) {
         try {
-          // --- CONDITIONAL URLS BASED ON ROLE ---
-          // Admin gets ALL data (for dashboard filters/lookups)
-          // Employees get only ASSIGNED data (for dropdowns in add form)
           const expenseUrl = isAdmin 
             ? 'http://127.0.0.1:8000/expense-type/all' 
             : `http://127.0.0.1:8000/expense-type/by-user/${user.EmployeeID}`;
@@ -43,14 +38,12 @@ function App() {
             ? 'http://127.0.0.1:8000/payment-mode/all'
             : `http://127.0.0.1:8000/payment-mode/by-user/${user.EmployeeID}`;
 
-          // 1. Fetch Expense Types
           const typesRes = await fetch(expenseUrl);
           if (typesRes.ok) {
             const typesData = await typesRes.json();
             dispatch(setExpenseTypes(typesData));
           }
 
-          // 2. Fetch Payment Modes
           const modesRes = await fetch(paymentUrl);
           if (modesRes.ok) {
              const modesData = await modesRes.json();
@@ -74,8 +67,6 @@ function App() {
   const navigateToLogin = () => setAuthView('login');
   const navigateToForgot = () => setAuthView('forgot');
 
-  // --- RENDER LOGIC ---
-
   if (isAuthenticated) {
     return (
       <div className={styles.app}>
@@ -95,25 +86,16 @@ function App() {
               />
           )}
         </main>
-
-        <Footer />
+        {/* Footer removed from here to make it scrollable inside components */}
       </div>
     );
   }
 
   return (
     <>
-      {authView === 'home' && (
-        <HomePage onNavigateLogin={navigateToLogin} />
-      )}
-      
-      {authView === 'login' && (
-        <LoginPage onForgotPassword={navigateToForgot} />
-      )}
-      
-      {authView === 'forgot' && (
-        <ForgotPasswordPage onNavigateLogin={navigateToLogin} />
-      )}
+      {authView === 'home' && <HomePage onNavigateLogin={navigateToLogin} />}
+      {authView === 'login' && <LoginPage onForgotPassword={navigateToForgot} />}
+      {authView === 'forgot' && <ForgotPasswordPage onNavigateLogin={navigateToLogin} />}
     </>
   );
 }

@@ -1,27 +1,27 @@
+# Backend/routes/expense.py
 import datetime
 import json
+import asyncio
 from typing import List, Optional
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException
-from db import expenses_collection, fs, expense_type_collection
-from bson import ObjectId
 from fastapi.responses import StreamingResponse
+from bson import ObjectId
+
+# Imports from your project structure
+from db import expenses_collection, expense_type_collection
+from models import ExpenseDeleteRequest
+
+# Import the new utils
+from gdrive_utils import (
+    upload_file_to_drive, 
+    delete_file_from_drive, 
+    stream_file_content  # 👈 Using the streaming function
+)
 
 router = APIRouter(
     prefix="/expense",
     tags=["Expenses"]
 )
-
-# Helper function to get file details
-def get_file_details(file_ids):
-    files = []
-    for file_id in file_ids:
-        try:
-            grid_out = fs.get(ObjectId(file_id))
-            files.append({"id": str(file_id), "filename": grid_out.filename})
-        except:
-            # Handle cases where a file ID exists in the array but the file is gone from GridFS
-            files.append({"id": str(file_id), "filename": "Unknown File"})
-    return files
 
 # ---------------- CREATE EXPENSE ----------------
 @router.post("/create")
@@ -44,11 +44,21 @@ async def create_expense(
     if not ObjectId.is_valid(expenseTypeId) or not expense_type_collection.find_one({"_id": ObjectId(expenseTypeId)}):
         raise HTTPException(status_code=400, detail="Invalid expenseTypeId")
 
-    file_ids = []
+    # 🟢 1. PARALLEL UPLOAD LOGIC
+    # We create a list of upload tasks and run them all at once using asyncio.gather
+    upload_tasks = []
     for file in attachments:
-        content = await file.read()
-        file_id = fs.put(content, filename=file.filename, contentType=file.content_type)
-        file_ids.append(str(file_id))
+        upload_tasks.append(upload_file_to_drive(file))
+    
+    uploaded_files_metadata = []
+    if upload_tasks:
+        try:
+            # Wait for all uploads to finish in parallel
+            results = await asyncio.gather(*upload_tasks)
+            # Filter out any failed uploads (None)
+            uploaded_files_metadata = [res for res in results if res]
+        except Exception as e:
+            print(f"Parallel upload error: {e}")
 
     expense_data = {
         "expenseTypeId": expenseTypeId,
@@ -64,7 +74,7 @@ async def create_expense(
         "location": location,
         "equipmentName": equipmentName,
         "equipmentType": equipmentType,
-        "attachments": file_ids, # Store just IDs in DB
+        "attachments": uploaded_files_metadata, # Store full object list
         "createdAt": datetime.datetime.now(),
         "updatedAt": datetime.datetime.now()
     }
@@ -78,8 +88,8 @@ def get_all_expenses():
     expenses = list(expenses_collection.find())
     for exp in expenses:
         exp["_id"] = str(exp["_id"])
-        # Enrich attachment IDs with filenames
-        exp["attachments"] = get_file_details(exp.get("attachments", []))
+        if "attachments" not in exp:
+            exp["attachments"] = []
     return expenses
 
 # ---------------- GET EXPENSE BY userId ----------------
@@ -88,8 +98,8 @@ def get_expenses_by_user(user_email: str):
     expenses = list(expenses_collection.find({"userEmail": user_email}))
     for exp in expenses:
         exp["_id"] = str(exp["_id"])
-        # Enrich attachment IDs with filenames
-        exp["attachments"] = get_file_details(exp.get("attachments", []))
+        if "attachments" not in exp:
+            exp["attachments"] = []
     return expenses
 
 # ---------------- UPDATE EXPENSE ----------------
@@ -109,9 +119,8 @@ async def update_expense(
     location: Optional[str] = Form(None),
     equipmentName: Optional[str] = Form(None),
     equipmentType: Optional[str] = Form(None),
-    # New fields for handling files
-    keptAttachments: str = Form("[]"), # JSON string of IDs to keep
-    newAttachments: List[UploadFile] = File([]) # New files to add
+    keptAttachments: str = Form("[]"), # JSON string
+    newAttachments: List[UploadFile] = File([])
 ):
     if not ObjectId.is_valid(expense_id):
         raise HTTPException(status_code=400, detail="Invalid expense ID")
@@ -120,7 +129,7 @@ async def update_expense(
     if not existing_expense:
         raise HTTPException(status_code=404, detail="Expense not found")
 
-    # 1. Prepare basic field updates
+    # 1. Standard Fields Update
     update_data = {}
     fields_to_update = {
         "expenseTypeId": expenseTypeId, "title": title, "date": date,
@@ -133,42 +142,49 @@ async def update_expense(
         if value is not None:
             update_data[field] = value
 
-    # 2. Handle File Deletions
-    # Parse the list of attachment IDs the user wants to keep
+    # 2. Handle File Logic (Kept Files)
     try:
-        kept_attachment_ids = json.loads(keptAttachments)
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="Invalid keptAttachments format")
+        kept_raw = json.loads(keptAttachments)
+        kept_ids = []
+        for item in kept_raw:
+            if isinstance(item, dict):
+                kept_ids.append(item.get('id'))
+            else:
+                kept_ids.append(item)
+    except:
+        kept_ids = []
 
-    current_attachment_ids = existing_expense.get("attachments", [])
+    current_attachments = existing_expense.get("attachments", [])
+    final_attachments = []
     
-    # Find files that are in the DB but NOT in the 'kept' list. These are removed.
-    files_to_delete_ids = [
-        fid for fid in current_attachment_ids if fid not in kept_attachment_ids
-    ]
+    # A. Delete Removed Files
+    for att in current_attachments:
+        att_id = att['id'] if isinstance(att, dict) else att
+        
+        if att_id in kept_ids:
+            # Keep file
+            if isinstance(att, dict):
+                final_attachments.append(att)
+            else:
+                final_attachments.append({"id": att, "filename": "Legacy File"})
+        else:
+            # Delete file
+            delete_file_from_drive(att_id)
 
-    # Delete them from GridFS
-    for file_id in files_to_delete_ids:
-        try:
-            fs.delete(ObjectId(file_id))
-        except Exception as e:
-            print(f"Error deleting file {file_id}: {e}")
-
-    # 3. Handle New File Uploads
-    new_file_ids = []
+    # 🟢 B. Upload New Files (Parallel)
+    new_upload_tasks = []
     for file in newAttachments:
-        content = await file.read()
-        file_id = fs.put(content, filename=file.filename, contentType=file.content_type)
-        new_file_ids.append(str(file_id))
+        new_upload_tasks.append(upload_file_to_drive(file))
+    
+    if new_upload_tasks:
+        try:
+            new_results = await asyncio.gather(*new_upload_tasks)
+            # Add successful uploads to final list
+            final_attachments.extend([res for res in new_results if res])
+        except Exception as e:
+            print(f"Parallel update upload error: {e}")
 
-    # 4. Combine kept and new files for the final list
-    final_attachment_ids = kept_attachment_ids + new_file_ids
-    update_data["attachments"] = final_attachment_ids
-
-    # 5. Perform the update
-    if not update_data and not files_to_delete_ids and not new_file_ids:
-         # If nothing changed, just return success
-         return {"message": "No changes detected"}
+    update_data["attachments"] = final_attachments
 
     expenses_collection.update_one(
         {"_id": ObjectId(expense_id)},
@@ -177,56 +193,73 @@ async def update_expense(
 
     return {"message": "Expense updated successfully"}
 
-# ... (Delete and Download APIs remain the same) ...
 # ---------------- DELETE EXPENSE ----------------
-@router.delete("/delete/{expense_id}")
-def delete_expense(expense_id: str):
-    if not ObjectId.is_valid(expense_id):
-        raise HTTPException(status_code=400, detail="Invalid expense ID")
+@router.delete("/delete")
+def delete_expenses(payload: ExpenseDeleteRequest):
+    deleted_expenses = []
+    not_found_expenses = []
 
-    result = expenses_collection.delete_one({"_id": ObjectId(expense_id)})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Expense not found")
+    for expense_id in payload.expenseIds:
+        if not ObjectId.is_valid(expense_id):
+            not_found_expenses.append(expense_id)
+            continue
 
-    return {"message": "Expense deleted successfully"}
+        expense = expenses_collection.find_one({"_id": ObjectId(expense_id)})
+        if not expense:
+            not_found_expenses.append(expense_id)
+            continue
+
+        # Delete all attachments in Drive
+        attachments = expense.get("attachments", [])
+        for att in attachments:
+            att_id = att['id'] if isinstance(att, dict) else att
+            delete_file_from_drive(att_id)
+
+        expenses_collection.delete_one({"_id": ObjectId(expense_id)})
+        deleted_expenses.append(expense_id)
+
+    return {
+        "message": "Expense delete operation completed",
+        "deletedCount": len(deleted_expenses),
+        "deletedExpenseIds": deleted_expenses,
+        "notFoundExpenseIds": not_found_expenses
+    }
 
 # ---------------- DOWNLOAD ATTACHMENT ----------------
 @router.get("/attachment/{file_id}")
 def download_attachment(file_id: str):
-    try:
-        file = fs.get(ObjectId(file_id))
-    except:
-        raise HTTPException(status_code=404, detail="File not found")
+    # 🟢 UPDATED: Use the streaming generator
+    # This prevents the server from loading the full file into RAM
+    # and starts the download immediately for the user.
+    iterfile, filename, mime_type = stream_file_content(file_id)
+    
+    if iterfile is None:
+        raise HTTPException(status_code=404, detail="File not found in Drive")
 
     return StreamingResponse(
-        file,
-        media_type=file.content_type,
-        headers={"Content-Disposition": f"attachment; filename={file.filename}"}
+        iterfile(),
+        media_type=mime_type,
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
 # ---------------- DELETE SPECIFIC ATTACHMENT ----------------
 @router.delete("/expense/{expense_id}/attachment/{file_id}")
 def remove_attachment(expense_id: str, file_id: str):
-    if not ObjectId.is_valid(expense_id) or not ObjectId.is_valid(file_id):
+    if not ObjectId.is_valid(expense_id):
         raise HTTPException(status_code=400, detail="Invalid ID format")
 
-    # 1. Remove ID from the expense document's 'attachments' array
-    result = expenses_collection.update_one(
+    # 1. Delete from Drive
+    delete_file_from_drive(file_id)
+
+    # 2. Pull from DB
+    expenses_collection.update_one(
+        {"_id": ObjectId(expense_id)},
+        {"$pull": {"attachments": {"id": file_id}}}
+    )
+    # Legacy support
+    expenses_collection.update_one(
         {"_id": ObjectId(expense_id)},
         {"$pull": {"attachments": file_id}}
     )
-
-    if result.modified_count == 0:
-        # If it wasn't in the array, maybe it didn't exist or was already removed
-        # We can still try to delete from GridFS to be safe, or raise 404
-        pass 
-
-    # 2. Remove the actual file content from GridFS
-    try:
-        fs.delete(ObjectId(file_id))
-    except Exception as e:
-        print(f"GridFS delete error: {e}") 
-        # We don't raise error here to ensure the UI stays consistent 
-        # (if DB ref is gone, file is effectively gone for app)
 
     return {"message": "Attachment removed successfully"}

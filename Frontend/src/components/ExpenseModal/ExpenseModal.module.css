@@ -347,7 +347,15 @@
   transform: translateY(-1px);
   box-shadow: 0 6px 12px rgba(220, 177, 88, 0.3);
 }
+.spinner {
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
+}
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -367,18 +375,73 @@
 }
 
 /* Mobile */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  /* 1. Remove the gray overlay padding so modal touches edges */
+  .modalOverlay {
+    padding: 0;
+    align-items: flex-end; /* Optional: slides up from bottom feel */
+  }
+
+  /* 2. Make Modal Full Screen */
   .modal {
-    height: 100vh;
-    max-height: 100vh;
-    border-radius: 0;
+    width: 100%;
+    height: 100%;       /* Fill height */
+    max-height: 100%;   /* Force full height */
+    border-radius: 0;   /* Remove rounded corners */
+    display: flex;
+    flex-direction: column;
+    box-shadow: none;   /* Flat look */
+  }
+
+  /* 3. Compact Header */
+  .modalHeader {
+    padding: 1rem; /* Smaller padding */
+    border-bottom: 1px solid #f3f4f6;
   }
   
+  .modalTitle {
+    font-size: 1.25rem; /* Slightly smaller title */
+  }
+
+  /* 4. Optimize Body Space */
+  .modalBody {
+    padding: 1rem; /* Wider inputs */
+    background-color: #ffffff; /* Ensure white background */
+  }
+
+  /* 5. Adjust Form Rows to stack cleanly */
   .row {
-      flex-direction: column;
-      gap: 0;
+    flex-direction: column;
+    gap: 0; /* Remove horizontal gap */
   }
-  
-  .modalHeader { padding: 1rem 1.5rem; }
-  .modalBody { padding: 1.5rem; }
+
+  /* Inputs need to be compact but touch-friendly */
+  .formGroup {
+    margin-bottom: 1rem; /* Less vertical space between fields */
+  }
+
+  .label {
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .input, .textarea, .radioLabel {
+    padding: 0.7rem; /* Comfortable touch target */
+    font-size: 16px; /* Prevents iOS zooming on focus */
+  }
+
+  /* 6. Sticky Footer for Actions */
+  .modalActions {
+    padding: 1rem;
+    background-color: white;
+    border-top: 1px solid #e5e7eb;
+    /* Optional: Make it stick to bottom if body scrolls */
+    margin-top: auto; 
+    gap: 0.75rem;
+  }
+
+  .cancelButton, .submitButton {
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
 }

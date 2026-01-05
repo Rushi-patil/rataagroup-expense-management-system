@@ -1,115 +1,135 @@
-import React from 'react';
-import { Edit2, Trash2, Calendar, Paperclip, Clock } from 'lucide-react';
+import React, { useRef } from 'react';
+import { Edit2, Trash2, Calendar, Paperclip, MapPin, Wrench, Truck } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import styles from './ExpenseCard.module.css';
 
 const ExpenseCard = ({ expense, expenseTypeName, onEdit, onDelete }) => {
-  
+  const bodyRef = useRef(null);
+
+  // Reset scroll position when mouse leaves the card
+  const handleMouseLeave = () => {
+    if (bodyRef.current) {
+      bodyRef.current.scrollTop = 0;
+    }
+  };
+
+  const isLongTitle = expense.title.length > 20;
+
   // Helper to generate attachment URL
   const getAttachmentUrl = (id) => {
     return `http://127.0.0.1:8000/expense/attachment/${id}`;
   };
 
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onMouseLeave={handleMouseLeave}>
       
-      {/* Header: Title, Type Badge, Amount */}
+      {/* --- FIXED HEADER --- */}
       <div className={styles.cardHeader}>
-        <div className={styles.titleSection}>
-          <h3 className={styles.title}>{expense.title}</h3>
-          <span className={styles.categoryBadge}>
-             {expenseTypeName || 'General'} 
-          </span>
+        <div className={styles.topRow}>
+          <h3 className={`${styles.title} ${isLongTitle ? styles.longTitle : ''}`} title={expense.title}>
+            {expense.title}
+          </h3>
+          <span className={styles.amount}>{formatCurrency(expense.amount)}</span>
         </div>
-        <div className={styles.amount}>
-          {formatCurrency(expense.amount)}
-        </div>
+        <span className={styles.badge}>{expenseTypeName || 'General'}</span>
       </div>
 
-      {/* Date */}
-      <div className={styles.dateRow}>
-        <Calendar size={14} className={styles.icon} /> 
-        {/* Formatting ISO Date from API */}
-        <span>
+      {/* --- SCROLLABLE BODY --- */}
+      <div className={styles.cardBody} ref={bodyRef}>
+        
+        <div className={styles.dateRow}>
+          <Calendar size={14} className={styles.icon} />
+          <span>
             {new Date(expense.date).toLocaleString('en-GB', {
                 day: '2-digit', month: 'short', year: 'numeric',
                 hour: '2-digit', minute: '2-digit', hour12: true
             })}
-        </span>
-      </div>
+          </span>
+        </div>
 
-      {/* --- DETAILS BLOCK (Conditional Fields) --- */}
-      <div className={styles.detailsBlock}>
-         {/* Main Description */}
-         {expense.description && expense.description.trim() !== "" && (
-            <p className={styles.detailText}>Description: {expense.description}</p>
-         )}
-         
-         {/* Specific Fields based on Type */}
-         {expense.carNumber && (
-            <p className={styles.detailMeta}>Vehicle No: <strong>{expense.carNumber}</strong></p>
-         )}
-         {expense.serviceType && (
-            <p className={styles.detailMeta}>Service: <strong>{expense.serviceType}</strong></p>
-         )}
-         {expense.location && (
-            <p className={styles.detailMeta}>Location: {expense.location}</p>
-         )}
-         {expense.equipmentName && (
-            <p className={styles.detailMeta}>Equipment: <strong>{expense.equipmentName}</strong></p>
-         )}
-      </div>
+        {expense.carNumber && (
+          <div className={styles.infoRow}>
+            <span className={styles.label}>Vehicle No:</span>
+            <span className={styles.valueHighlight}>{expense.carNumber}</span>
+          </div>
+        )}
 
-      {/* --- ATTACHMENTS --- */}
-      {expense.attachments && expense.attachments.length > 0 && (
-        <div className={styles.attachmentRow}>
-          <Paperclip size={14} className={styles.icon} /> 
-          <span className={styles.attachmentLabel}>Attachments:</span>
-          <div className={styles.attachmentLinks}>
-            {expense.attachments.map((att) => (
+        {/* --- ADDED LABEL FOR DESCRIPTION --- */}
+        {expense.description && (
+          <div className={styles.description}>
+            <span className={styles.descLabel}>Description:</span> {expense.description}
+          </div>
+        )}
+
+        {/* --- ADDED LABELS FOR EXTRA DETAILS --- */}
+        {(expense.location || expense.serviceType || expense.equipmentName) && (
+            <div className={styles.extraDetails}>
+                {expense.location && (
+                    <div className={styles.detailItem}>
+                        <MapPin size={12} className={styles.detailIcon}/> 
+                        <span className={styles.detailText}><strong>Loc:</strong> {expense.location}</span>
+                    </div>
+                )}
+                {expense.serviceType && (
+                    <div className={styles.detailItem}>
+                        <Wrench size={12} className={styles.detailIcon}/> 
+                        <span className={styles.detailText}><strong>Svc:</strong> {expense.serviceType}</span>
+                    </div>
+                )}
+                {expense.equipmentName && (
+                    <div className={styles.detailItem}>
+                        <Truck size={12} className={styles.detailIcon}/> 
+                        <span className={styles.detailText}><strong>Eqp:</strong> {expense.equipmentName}</span>
+                    </div>
+                )}
+            </div>
+        )}
+
+        {expense.attachments && expense.attachments.length > 0 && (
+          <div className={styles.attachments}>
+            <div className={styles.attachLabel}><Paperclip size={12} /> Attachments:</div>
+            <div className={styles.fileList}>
+              {expense.attachments.map((file, index) => (
                 <a 
-                    key={att.id} 
-                    href={getAttachmentUrl(att.id)} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className={styles.attLink}
-                    title={att.filename} // Show full name on hover
+                  key={index} 
+                  href={getAttachmentUrl(file.id)}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={styles.fileLink}
+                  onClick={(e) => e.stopPropagation()} 
+                  title={file.filename}
                 >
-                    {/* Display Actual Filename instead of "File X" */}
-                    {att.filename}
+                  {file.filename || file.name}
                 </a>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Footer: Timestamps & Actions */}
+      {/* --- FIXED FOOTER --- */}
       <div className={styles.cardFooter}>
-        <div className={styles.timestamps}>
-          <div className={styles.timeItem}>
-            <Clock size={12} /> 
-            Created: {new Date(expense.createdAt).toLocaleDateString()}
-          </div>
-        </div>
-
+        <span className={styles.createdDate}>
+           Created: {new Date(expense.createdAt || Date.now()).toLocaleDateString()}
+        </span>
         <div className={styles.actions}>
-          <button
-            onClick={() => onEdit(expense)}
-            className={styles.editButton}
+          <button 
+            className={styles.editBtn} 
+            onClick={(e) => { e.stopPropagation(); onEdit(expense); }}
             title="Edit Expense"
           >
-            <Edit2 size={16} /> 
-            <span>Edit</span>
+            <Edit2 size={14} /> Edit
           </button>
-          <button
-            onClick={() => onDelete(expense._id)} // Using Database _id
-            className={styles.deleteButton}
+          <button 
+            className={styles.deleteBtn} 
+            onClick={(e) => { e.stopPropagation(); onDelete(expense._id); }}
             title="Delete Expense"
           >
-            <Trash2 size={16} />
+            <Trash2 size={14} />
           </button>
         </div>
       </div>
+
     </div>
   );
 };

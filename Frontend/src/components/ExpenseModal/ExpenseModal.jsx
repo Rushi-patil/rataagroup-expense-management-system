@@ -11,15 +11,12 @@ import CustomDateTimePicker from '../UI/CustomDateTimePicker';
 import styles from './ExpenseModal.module.css';
 
 const ExpenseModal = ({ editingExpense, onClose, onSubmit, userEmail }) => {
-  // --- REDUX DATA (With Safeguards) ---
-  // We default to empty object {} to prevent crash if masterData is null
+  // ... (Keep existing State and Redux selections) ...
   const { expenseTypes = [], paymentModes = [] } = useSelector((state) => state.masterData || {});
   
-  // Transform for Dropdowns (Safe mapping)
   const expenseTypeOptions = (expenseTypes || []).map(item => item.ExpenseTypeName);
   const paymentModeOptions = (paymentModes || []).map(item => item.paymentModeName);
 
-  // --- HELPER: Get Local Date String ---
   const formatDateToLocalInput = (dateObj) => {
     if (!dateObj) return '';
     const d = new Date(dateObj);
@@ -49,7 +46,7 @@ const ExpenseModal = ({ editingExpense, onClose, onSubmit, userEmail }) => {
   const SERVICE_TYPES = ['Food', 'Accommodation', 'Both'];
   const PLANT_EQUIPMENT_TYPES = ['Electrical', 'Mechanical', 'Heavy Machinery', 'Tools', 'Other'];
 
-  // --- Load Data on Edit ---
+  // ... (Keep existing useEffect for Edit Data Loading) ...
   useEffect(() => {
     if (editingExpense && expenseTypes.length > 0) {
       const typeObj = expenseTypes.find(t => t._id === editingExpense.expenseTypeId);
@@ -85,6 +82,7 @@ const ExpenseModal = ({ editingExpense, onClose, onSubmit, userEmail }) => {
     }
   }, [editingExpense, expenseTypes]);
 
+  // ... (Keep validateForm) ...
   const validateForm = () => {
     const newErrors = {};
     if (!formData.expenseType) newErrors.expenseType = 'Expense Type is required';
@@ -107,6 +105,8 @@ const ExpenseModal = ({ editingExpense, onClose, onSubmit, userEmail }) => {
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
+    
+    // --- 1. SET LOADING STATE ---
     setIsSubmitting(true);
 
     try {
@@ -128,13 +128,11 @@ const ExpenseModal = ({ editingExpense, onClose, onSubmit, userEmail }) => {
         payload.append('equipmentName', formData.equipmentName || '');
         payload.append('equipmentType', formData.equipmentType || '');
 
+        // ... (Keep Attachment Logic) ...
         if (formData.billAvailable === 'Yes') {
             if (editingExpense) {
-                const keptAttachments = attachments
-                    .filter(att => att.isExisting)
-                    .map(att => att.id);
+                const keptAttachments = attachments.filter(att => att.isExisting).map(att => att.id);
                 payload.append('keptAttachments', JSON.stringify(keptAttachments));
-
                 attachments.forEach((fileObj) => {
                     if (!fileObj.isExisting && fileObj.file) {
                         payload.append('newAttachments', fileObj.file);
@@ -181,10 +179,12 @@ const ExpenseModal = ({ editingExpense, onClose, onSubmit, userEmail }) => {
         console.error("Network Error:", error);
         alert("An error occurred. Please check your connection.");
     } finally {
+        // --- 2. RESET LOADING STATE ---
         setIsSubmitting(false);
     }
   };
 
+  // ... (Keep existing Handlers for Change, File, etc.) ...
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: null }));
@@ -213,69 +213,79 @@ const ExpenseModal = ({ editingExpense, onClose, onSubmit, userEmail }) => {
   };
 
   const renderConditionalFields = () => {
-    switch (formData.expenseType) {
-      case 'Guest House Expenses': 
-        return (
-          <div className={styles.sectionBlock}>
-             <h4 className={styles.sectionTitle}><Home size={16}/> Guest House Details</h4>
-             <div className={styles.formGroup}>
-                <label className={styles.label}>Description</label>
-                <textarea value={formData.description} onChange={(e) => handleChange('description', e.target.value)} className={styles.textarea} rows="2" placeholder="Enter details..." />
-             </div>
-          </div>
-        );
-      case 'Company Vehicle Diesel':
-        return (
-          <div className={styles.sectionBlock}>
-            <h4 className={styles.sectionTitle}><Truck size={16}/> Vehicle & Fuel Details</h4>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Car Number *</label>
-              <input type="text" value={formData.carNumber} onChange={(e) => handleChange('carNumber', e.target.value)} className={styles.input} placeholder="e.g. MH12AB1234" />
-              {errors.carNumber && <p className={styles.error}>{errors.carNumber}</p>}
+      // ... (Keep existing render logic) ...
+      switch (formData.expenseType) {
+        case 'Guest House Expenses': 
+          return (
+            <div className={styles.sectionBlock}>
+               <h4 className={styles.sectionTitle}><Home size={16}/> Guest House Details</h4>
+               <div className={styles.formGroup}>
+                  <label className={styles.label}>Description</label>
+                  <textarea value={formData.description} onChange={(e) => handleChange('description', e.target.value)} className={styles.textarea} rows="2" placeholder="Enter details..." />
+               </div>
             </div>
-          </div>
-        );
-      case 'Food & Accommodation':
-        return (
-          <div className={styles.sectionBlock}>
-            <h4 className={styles.sectionTitle}><Utensils size={16}/> Food & Stay Details</h4>
-            <div className={styles.row}>
-                <div style={{ flex: 1 }}>
-                    <CustomDropdown label="Service Type *" value={formData.serviceType} onChange={(val) => handleChange('serviceType', val)} options={SERVICE_TYPES} placeholder="Select Type" error={errors.serviceType} />
-                </div>
-                <div className={styles.formGroup} style={{ marginBottom: '1.25rem' }}>
-                    <label className={styles.label}>Location (Optional)</label>
-                    <input type="text" value={formData.location} onChange={(e) => handleChange('location', e.target.value)} className={styles.input} placeholder="City or Hotel Name" />
-                </div>
+          );
+        case 'Company Vehicle Diesel':
+          return (
+            <div className={styles.sectionBlock}>
+              <h4 className={styles.sectionTitle}><Truck size={16}/> Vehicle & Fuel Details</h4>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Car Number *</label>
+                <input type="text" value={formData.carNumber} onChange={(e) => handleChange('carNumber', e.target.value)} className={styles.input} placeholder="e.g. MH12AB1234" />
+                {errors.carNumber && <p className={styles.error}>{errors.carNumber}</p>}
+              </div>
             </div>
-          </div>
-        );
-      case 'Plant Expenses':
-        return (
-          <div className={styles.sectionBlock}>
-            <h4 className={styles.sectionTitle}><Wrench size={16}/> Equipment Details</h4>
-            <div className={styles.row}>
-                <div className={styles.formGroup} style={{ marginBottom: '1.25rem' }}>
-                    <label className={styles.label}>Equipment Name *</label>
-                    <input type="text" value={formData.equipmentName} onChange={(e) => handleChange('equipmentName', e.target.value)} className={styles.input} placeholder="e.g. Generator 500kVA" />
-                    {errors.equipmentName && <p className={styles.error}>{errors.equipmentName}</p>}
-                </div>
-                <div style={{ flex: 1 }}>
-                    <CustomDropdown label="Type (Optional)" value={formData.equipmentType} onChange={(val) => handleChange('equipmentType', val)} options={PLANT_EQUIPMENT_TYPES} placeholder="Select Type" />
-                </div>
+          );
+        case 'Food & Accommodation':
+          return (
+            <div className={styles.sectionBlock}>
+              <h4 className={styles.sectionTitle}><Utensils size={16}/> Food & Stay Details</h4>
+              <div className={styles.row}>
+                  <div style={{ flex: 1 }}>
+                      <CustomDropdown label="Service Type *" value={formData.serviceType} onChange={(val) => handleChange('serviceType', val)} options={SERVICE_TYPES} placeholder="Select Type" error={errors.serviceType} />
+                  </div>
+                  <div className={styles.formGroup} style={{ marginBottom: '1.25rem' }}>
+                      <label className={styles.label}>Location (Optional)</label>
+                      <input type="text" value={formData.location} onChange={(e) => handleChange('location', e.target.value)} className={styles.input} placeholder="City or Hotel Name" />
+                  </div>
+              </div>
             </div>
-          </div>
-        );
-      default: return null;
-    }
+          );
+        case 'Plant Expenses':
+          return (
+            <div className={styles.sectionBlock}>
+              <h4 className={styles.sectionTitle}><Wrench size={16}/> Equipment Details</h4>
+              <div className={styles.row}>
+                  <div className={styles.formGroup} style={{ marginBottom: '1.25rem' }}>
+                      <label className={styles.label}>Equipment Name *</label>
+                      <input type="text" value={formData.equipmentName} onChange={(e) => handleChange('equipmentName', e.target.value)} className={styles.input} placeholder="e.g. Generator 500kVA" />
+                      {errors.equipmentName && <p className={styles.error}>{errors.equipmentName}</p>}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                      <CustomDropdown label="Type (Optional)" value={formData.equipmentType} onChange={(val) => handleChange('equipmentType', val)} options={PLANT_EQUIPMENT_TYPES} placeholder="Select Type" />
+                  </div>
+              </div>
+            </div>
+          );
+        default: return null;
+      }
   };
 
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
+    // Prevent close on overlay click if submitting
+    <div className={styles.modalOverlay} onClick={!isSubmitting ? onClose : undefined}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <h2 className={styles.modalTitle}>{editingExpense ? 'Edit Expense' : 'Add New Expense'}</h2>
-          <button className={styles.closeButton} onClick={onClose} disabled={isSubmitting}><X size={24} /></button>
+          {/* DISABLE X BUTTON */}
+          <button 
+            className={styles.closeButton} 
+            onClick={onClose} 
+            disabled={isSubmitting}
+            style={{ opacity: isSubmitting ? 0.5 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
+          >
+            <X size={24} />
+          </button>
         </div>
         <div className={styles.modalBody}>
           
@@ -362,8 +372,21 @@ const ExpenseModal = ({ editingExpense, onClose, onSubmit, userEmail }) => {
           )}
         </div>
         <div className={styles.modalActions}>
-          <button className={styles.cancelButton} onClick={onClose} disabled={isSubmitting}>Cancel</button>
-          <button className={styles.submitButton} onClick={handleSubmit} disabled={isSubmitting}>
+          {/* DISABLE CANCEL */}
+          <button 
+            className={styles.cancelButton} 
+            onClick={onClose} 
+            disabled={isSubmitting}
+          >
+            Cancel
+          </button>
+          
+          {/* DISABLE SUBMIT + LOADER */}
+          <button 
+            className={styles.submitButton} 
+            onClick={handleSubmit} 
+            disabled={isSubmitting}
+          >
             {isSubmitting ? <><Loader2 className={styles.spinner} size={18} /> Processing...</> : (editingExpense ? 'Save Changes' : 'Create Expense')}
           </button>
         </div>
